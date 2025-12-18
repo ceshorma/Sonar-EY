@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONAR | EY - Sistema de Levantamiento de Oportunidades</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           EY BRAND VARIABLES
+           ============================================ */
+        :root {
+            --ey-yellow: #FFE600;
+            --ey-yellow-dark: #FFDB00;
+            --ey-yellow-light: #FFF176;
+            --ey-dark-gray: #2E2E38;
+            --ey-medium-gray: #747480;
+            --ey-light-gray: #C4C4CD;
+            --ey-faint-gray: #F6F6FA;
+            --ey-white: #FFFFFF;
+            --ey-black: #000000;
+            
+            --primary: var(--ey-dark-gray);
+            --accent: var(--ey-yellow);
+            --sonar-pulse: rgba(255, 230, 0, 0.3);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow: hidden; height: 100%; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary);
+            color: var(--ey-white);
+        }
+        
+        /* ============================================
+           PRESENTATION CONTAINER
+           ============================================ */
+        .presentation {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .slides-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ============================================
+           SLIDE BASE
+           ============================================ */
+        .slide {
+            min-width: 100vw;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide--dark {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1a22 100%);
+            color: var(--ey-white);
+        }
+        
+        .slide--light {
+            background: linear-gradient(135deg, var(--ey-white) 0%, var(--ey-faint-gray) 100%);
+            color: var(--ey-dark-gray);
+        }
+        
+        .slide--accent {
+            background: linear-gradient(135deg, var(--ey-yellow) 0%, var(--ey-yellow-dark) 100%);
+            color: var(--ey-dark-gray);
+        }
+        
+        /* ============================================
+           EY LOGO
+           ============================================ */
+        .ey-logo {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            z-index: 100;
+            width: 60px;
+            height: 52px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 70'%3E%3Cpath fill='%23FFE600' d='M0 0h80v70H0z'/%3E%3Cpath fill='%232E2E38' d='M12 15h56v8H12zM12 31h40v8H12zM12 47h56v8H12z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .slide--accent .ey-logo,
+        .slide--light .ey-logo {
+            filter: none;
+        }
+        
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .nav-dots {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+            padding: 12px 20px;
+            background: rgba(46, 46, 56, 0.95);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 230, 0, 0.2);
+        }
+        
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+        
+        .nav-dot:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(1.2);
+        }
+        
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.4);
+            box-shadow: 0 0 20px var(--sonar-pulse);
+        }
+        
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid rgba(255, 230, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .nav-arrow--prev { left: 20px; }
+        .nav-arrow--next { right: 20px; }
+        
+        .nav-arrow:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--sonar-pulse);
+        }
+        
+        .nav-arrow:hover svg { stroke: var(--primary); }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.95); }
+        .nav-arrow svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--ey-white);
+            stroke-width: 2.5;
+            fill: none;
+        }
+        
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .keyboard-hint {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+        
+        .key {
+            padding: 0.25rem 0.6rem;
+            border: 1px solid currentColor;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+        
+        .slide-counter {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.5;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* ============================================
+           CONTENT STYLES
+           ============================================ */
+        .slide-content {
+            text-align: center;
+            max-width: 1000px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .slide-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .slide-subtitle {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            font-weight: 400;
+            opacity: 0.85;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .highlight {
+            color: var(--accent);
+            position: relative;
+        }
+        
+        .slide--accent .highlight,
+        .slide--light .highlight {
+            color: var(--primary);
+        }
+        
+        /* ============================================
+           ANIMATIONS BASE
+           ============================================ */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-scale {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slide.in-view .animate-in,
+        .slide.in-view .animate-scale,
+        .slide.in-view .animate-left,
+        .slide.in-view .animate-right {
+            opacity: 1;
+            transform: translateY(0) translateX(0) scale(1);
+        }
+        
+        .slide.in-view .delay-1 { transition-delay: 0.1s; }
+        .slide.in-view .delay-2 { transition-delay: 0.2s; }
+        .slide.in-view .delay-3 { transition-delay: 0.3s; }
+        .slide.in-view .delay-4 { transition-delay: 0.4s; }
+        .slide.in-view .delay-5 { transition-delay: 0.5s; }
+        .slide.in-view .delay-6 { transition-delay: 0.6s; }
+        .slide.in-view .delay-7 { transition-delay: 0.7s; }
+        .slide.in-view .delay-8 { transition-delay: 0.8s; }
+        
+        /* ============================================
+           SONAR PULSE ANIMATION (HERO)
+           ============================================ */
+        .sonar-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        
+        .sonar-pulse {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            opacity: 0;
+            animation: sonarPulse 3s ease-out infinite;
+        }
+        
+        .sonar-pulse:nth-child(1) { animation-delay: 0s; }
+        .sonar-pulse:nth-child(2) { animation-delay: 0.75s; }
+        .sonar-pulse:nth-child(3) { animation-delay: 1.5s; }
+        .sonar-pulse:nth-child(4) { animation-delay: 2.25s; }
+        
+        @keyframes sonarPulse {
+            0% {
+                width: 50px;
+                height: 50px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 800px;
+                height: 800px;
+                opacity: 0;
+            }
+        }
+        
+        .sonar-center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 40px var(--accent), 0 0 80px var(--sonar-pulse);
+            animation: sonarGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes sonarGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px var(--accent), 0 0 80px var(--sonar-pulse); }
+            50% { transform: scale(1.2); box-shadow: 0 0 60px var(--accent), 0 0 120px var(--sonar-pulse); }
+        }
+        
+        /* ============================================
+           PARTICLE BACKGROUND
+           ============================================ */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatParticle 20s linear infinite;
+        }
+        
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* ============================================
+           SONAR TITLE EFFECT
+           ============================================ */
+        .sonar-title {
+            font-size: clamp(4rem, 12vw, 10rem);
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: var(--ey-white);
+            text-shadow: 0 0 60px var(--sonar-pulse);
+            position: relative;
+        }
+        
+        .sonar-title::after {
+            content: 'SONAR';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--accent);
+            animation: titleGlitch 4s ease-in-out infinite;
+        }
+        
+        @keyframes titleGlitch {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(2px, -2px); }
+            50% { transform: translate(-2px, 2px); }
+            75% { transform: translate(2px, 2px); }
+        }
+        
+        .tagline {
+            font-size: 1rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-top: 2rem;
+        }
+        
+        /* ============================================
+           PROBLEM SLIDE - CHAOS VISUALIZATION
+           ============================================ */
+        .chaos-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 2rem auto;
+            max-width: 400px;
+        }
+        
+        .chaos-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: chaosFloat 3s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chaos-icon:nth-child(odd) { animation-delay: -1s; }
+        .chaos-icon:nth-child(3n) { animation-delay: -2s; }
+        
+        @keyframes chaosFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(2deg); }
+            75% { transform: translateY(5px) rotate(-2deg); }
+        }
+        
+        .chaos-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--ey-white);
+            stroke-width: 1.5;
+            fill: none;
+            opacity: 0.6;
+        }
+        
+        .problem-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+        }
+        
+        .stat-number .counter {
+            display: inline-block;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        /* ============================================
+           SOLUTION SLIDE - RADAR VISUALIZATION
+           ============================================ */
+        .radar-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 0 auto 2rem;
+        }
+        
+        .radar-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .radar-circle {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1;
+            opacity: 0.3;
+        }
+        
+        .radar-line {
+            stroke: var(--accent);
+            stroke-width: 1;
+            opacity: 0.2;
+        }
+        
+        .radar-sweep {
+            fill: url(#sweepGradient);
+            transform-origin: center;
+            animation: radarSweep 4s linear infinite;
+        }
+        
+        @keyframes radarSweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .radar-blip {
+            fill: var(--accent);
+            opacity: 0;
+            animation: blipPulse 4s ease-in-out infinite;
+        }
+        
+        .radar-blip:nth-child(1) { animation-delay: 0.5s; }
+        .radar-blip:nth-child(2) { animation-delay: 1.5s; }
+        .radar-blip:nth-child(3) { animation-delay: 2.5s; }
+        .radar-blip:nth-child(4) { animation-delay: 3.5s; }
+        
+        @keyframes blipPulse {
+            0%, 20% { opacity: 0; transform: scale(0.5); }
+            30%, 70% { opacity: 1; transform: scale(1); }
+            80%, 100% { opacity: 0; transform: scale(1.5); }
+        }
+        
+        /* ============================================
+           HOW IT WORKS - FLOW DIAGRAM
+           ============================================ */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 3rem 0;
+        }
+        
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 200px;
+        }
+        
+        .flow-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--ey-yellow-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 40px rgba(255, 230, 0, 0.3);
+            position: relative;
+        }
+        
+        .flow-icon svg {
+            width: 44px;
+            height: 44px;
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .flow-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            animation: flowRing 2s ease-out infinite;
+        }
+        
+        @keyframes flowRing {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .flow-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .flow-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        
+        .flow-arrow {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .flow-arrow svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--accent);
+            stroke-width: 2;
+            fill: none;
+            animation: arrowPulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes arrowPulse {
+            0%, 100% { transform: translateX(0); opacity: 0.5; }
+            50% { transform: translateX(5px); opacity: 1; }
+        }
+        
+        /* ============================================
+           CHAT DEMO SLIDE
+           ============================================ */
+        .chat-container {
+            background: var(--ey-white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chat-header {
+            background: var(--primary);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-avatar svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .chat-header-text {
+            color: var(--ey-white);
+        }
+        
+        .chat-header-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .chat-header-status {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .chat-messages {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 300px;
+            background: #f8f9fa;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 0.8rem 1rem;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: messageIn 0.5s ease forwards;
+        }
+        
+        .chat-message.bot {
+            background: var(--ey-white);
+            color: var(--primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chat-message.user {
+            background: var(--primary);
+            color: var(--ey-white);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        @keyframes messageIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide.in-view .chat-message:nth-child(1) { animation-delay: 0.3s; }
+        .slide.in-view .chat-message:nth-child(2) { animation-delay: 1s; }
+        .slide.in-view .chat-message:nth-child(3) { animation-delay: 1.7s; }
+        .slide.in-view .chat-message:nth-child(4) { animation-delay: 2.4s; }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.8rem 1rem;
+            background: var(--ey-white);
+            border-radius: 16px;
+            width: fit-content;
+            opacity: 0;
+            animation: messageIn 0.5s ease forwards;
+            animation-delay: 3.1s;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--ey-medium-gray);
+            border-radius: 50%;
+            animation: typingBounce 1.4s ease-in-out infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        /* ============================================
+           ANALYSIS SLIDE - DATA VIZ
+           ============================================ */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+            max-width: 800px;
+        }
+        
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 230, 0, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .analysis-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(255, 230, 0, 0.15);
+        }
+        
+        .analysis-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--ey-yellow-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .analysis-icon svg {
+            width: 30px;
+            height: 30px;
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .analysis-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+        }
+        
+        .analysis-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+        
+        /* Progress bars */
+        .progress-container {
+            margin-top: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .progress-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--ey-yellow-dark) 100%);
+            border-radius: 4px;
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slide.in-view .progress-fill { width: var(--progress); }
+        
+        /* ============================================
+           BENEFITS SLIDE
+           ============================================ */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+        
+        .benefit-card {
+            background: rgba(46, 46, 56, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: left;
+            border: 1px solid rgba(255, 230, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(255, 230, 0, 0.15);
+        }
+        
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .benefit-icon svg {
+            width: 26px;
+            height: 26px;
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .benefit-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .benefit-desc {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+        
+        /* ============================================
+           USE CASES SLIDE
+           ============================================ */
+        .use-cases-container {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        .use-case {
+            background: var(--ey-white);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 280px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .use-case::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent);
+        }
+        
+        .use-case:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        .use-case-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--ey-faint-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .use-case-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--primary);
+            stroke-width: 1.5;
+            fill: none;
+        }
+        
+        .use-case-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .use-case-desc {
+            font-size: 0.85rem;
+            color: var(--ey-medium-gray);
+            line-height: 1.6;
+        }
+        
+        /* ============================================
+           CTA SLIDE
+           ============================================ */
+        .cta-visual {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-sonar {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        
+        .cta-pulse {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            animation: ctaPulse 2.5s ease-out infinite;
+        }
+        
+        .cta-pulse:nth-child(1) { animation-delay: 0s; }
+        .cta-pulse:nth-child(2) { animation-delay: 0.5s; }
+        .cta-pulse:nth-child(3) { animation-delay: 1s; }
+        
+        @keyframes ctaPulse {
+            0% { width: 60px; height: 60px; opacity: 0.8; }
+            100% { width: 200px; height: 200px; opacity: 0; }
+        }
+        
+        .cta-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 60px var(--sonar-pulse);
+        }
+        
+        .cta-center svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--accent);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 230, 0, 0.4);
+        }
+        
+        .cta-button svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        /* ============================================
+           WAVE DECORATION
+           ============================================ */
+        .wave-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            opacity: 0.1;
+        }
+        
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .nav-arrow { display: none; }
+            .keyboard-hint { display: none; }
+            .ey-logo { width: 45px; height: 39px; top: 20px; left: 20px; }
+            
+            .benefits-grid,
+            .analysis-grid { grid-template-columns: 1fr; }
+            
+            .flow-container { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            
+            .use-cases-container { flex-direction: column; align-items: center; }
+            
+            .problem-stats { gap: 1.5rem; }
+            .stat-number { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="nav-dots" id="navDots"></div>
+    
+    <button class="nav-arrow nav-arrow--prev" id="prevBtn" aria-label="Anterior">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button class="nav-arrow nav-arrow--next" id="nextBtn" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+    
+    <div class="keyboard-hint">
+        <span class="key">←</span><span class="key">→</span> navegar
+    </div>
+    
+    <!-- Presentation -->
+    <div class="presentation">
+        <div class="slides-track" id="slidesTrack">
+            
+            <!-- ==========================================
+                 SLIDE 1: HERO / PORTADA
+                 ========================================== -->
+            <section class="slide slide--dark in-view" data-slide="0">
+                <div class="ey-logo"></div>
+                
+                <!-- Particles Background -->
+                <div class="particles" id="particles1"></div>
+                
+                <!-- Sonar Pulse Effect -->
+                <div class="sonar-container">
+                    <div class="sonar-pulse"></div>
+                    <div class="sonar-pulse"></div>
+                    <div class="sonar-pulse"></div>
+                    <div class="sonar-pulse"></div>
+                    <div class="sonar-center"></div>
+                </div>
+                
+                <div class="slide-content">
+                    <h1 class="sonar-title animate-in">SONAR</h1>
+                    <p class="tagline animate-in delay-2">Sistema de Levantamiento de Oportunidades mediante IA Conversacional</p>
+                    <p class="slide-subtitle animate-in delay-3" style="margin-top: 3rem; opacity: 0.6;">
+                        Detectamos lo que otros métodos no pueden ver
+                    </p>
+                </div>
+                
+                <div class="slide-counter">01 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 2: EL PROBLEMA
+                 ========================================== -->
+            <section class="slide slide--dark" data-slide="1">
+                <div class="ey-logo"></div>
+                <div class="particles" id="particles2"></div>
+                
+                <div class="slide-content">
+                    <h2 class="slide-title animate-in">El Desafío de <span class="highlight">Escuchar</span></h2>
+                    <p class="slide-subtitle animate-in delay-1">
+                        Levantar información de cientos de personas es como buscar agujas en un pajar... con los ojos vendados.
+                    </p>
+                    
+                    <div class="chaos-grid animate-scale delay-2">
+                        <!-- Person icons representing interviews -->
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div class="chaos-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+                        </div>
+                    </div>
+                    
+                    <div class="problem-stats">
+                        <div class="stat-item animate-in delay-3">
+                            <div class="stat-number"><span class="counter" data-target="6">0</span>+</div>
+                            <div class="stat-label">Semanas promedio</div>
+                        </div>
+                        <div class="stat-item animate-in delay-4">
+                            <div class="stat-number">$<span class="counter" data-target="150">0</span>K</div>
+                            <div class="stat-label">Costo típico</div>
+                        </div>
+                        <div class="stat-item animate-in delay-5">
+                            <div class="stat-number"><span class="counter" data-target="40">0</span>%</div>
+                            <div class="stat-label">Datos perdidos</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-counter">02 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 3: LA SOLUCIÓN - SONAR
+                 ========================================== -->
+            <section class="slide slide--dark" data-slide="2">
+                <div class="ey-logo"></div>
+                
+                <div class="slide-content">
+                    <div class="radar-container animate-scale">
+                        <svg class="radar-svg" viewBox="0 0 300 300">
+                            <defs>
+                                <radialGradient id="sweepGradient" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#FFE600" stop-opacity="0"/>
+                                    <stop offset="70%" stop-color="#FFE600" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="#FFE600" stop-opacity="0"/>
+                                </radialGradient>
+                            </defs>
+                            
+                            <!-- Radar circles -->
+                            <circle class="radar-circle" cx="150" cy="150" r="40"/>
+                            <circle class="radar-circle" cx="150" cy="150" r="80"/>
+                            <circle class="radar-circle" cx="150" cy="150" r="120"/>
+                            
+                            <!-- Radar lines -->
+                            <line class="radar-line" x1="150" y1="30" x2="150" y2="270"/>
+                            <line class="radar-line" x1="30" y1="150" x2="270" y2="150"/>
+                            <line class="radar-line" x1="65" y1="65" x2="235" y2="235"/>
+                            <line class="radar-line" x1="235" y1="65" x2="65" y2="235"/>
+                            
+                            <!-- Radar sweep -->
+                            <path class="radar-sweep" d="M150,150 L150,30 A120,120 0 0,1 235,65 Z"/>
+                            
+                            <!-- Blips (opportunities detected) -->
+                            <circle class="radar-blip" cx="180" cy="90" r="6"/>
+                            <circle class="radar-blip" cx="100" cy="130" r="6"/>
+                            <circle class="radar-blip" cx="200" cy="180" r="6"/>
+                            <circle class="radar-blip" cx="120" cy="200" r="6"/>
+                            
+                            <!-- Center point -->
+                            <circle cx="150" cy="150" r="8" fill="#FFE600"/>
+                        </svg>
+                    </div>
+                    
+                    <h2 class="slide-title animate-in delay-2">SONAR <span class="highlight">Detecta</span></h2>
+                    <p class="slide-subtitle animate-in delay-3">
+                        Como un sonar submarino que revela lo oculto bajo las olas, nuestra IA escucha conversaciones naturales y detecta oportunidades de automatización que nadie más ve.
+                    </p>
+                </div>
+                
+                <div class="slide-counter">03 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 4: CÓMO FUNCIONA
+                 ========================================== -->
+            <section class="slide slide--light" data-slide="3">
+                <div class="ey-logo"></div>
+                
+                <div class="slide-content">
+                    <h2 class="slide-title animate-in">Así Funciona</h2>
+                    <p class="slide-subtitle animate-in delay-1">
+                        Tres pasos simples hacia insights profundos
+                    </p>
+                    
+                    <div class="flow-container">
+                        <div class="flow-step animate-left delay-2">
+                            <div class="flow-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                            </div>
+                            <div class="flow-title">Despliegue</div>
+                            <div class="flow-desc">Comparta el chatbot con sus stakeholders vía link</div>
+                        </div>
+                        
+                        <div class="flow-arrow animate-in delay-3">
+                            <svg viewBox="0 0 24 24">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="flow-step animate-in delay-4">
+                            <div class="flow-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                            <div class="flow-title">Conversación</div>
+                            <div class="flow-desc">IA guía una entrevista natural y estructurada</div>
+                        </div>
+                        
+                        <div class="flow-arrow animate-in delay-5">
+                            <svg viewBox="0 0 24 24">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="flow-step animate-right delay-6">
+                            <div class="flow-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                                    <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+                                </svg>
+                            </div>
+                            <div class="flow-title">Análisis</div>
+                            <div class="flow-desc">Datos consolidados e insights automáticos</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-counter">04 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 5: DEMO DE CONVERSACIÓN
+                 ========================================== -->
+            <section class="slide slide--dark" data-slide="4">
+                <div class="ey-logo"></div>
+                <div class="particles" id="particles5"></div>
+                
+                <div class="slide-content" style="display: flex; gap: 3rem; align-items: center; max-width: 1100px;">
+                    <div style="flex: 1; text-align: left;">
+                        <h2 class="slide-title animate-in" style="font-size: 2.5rem;">Conversaciones <span class="highlight">Naturales</span></h2>
+                        <p class="slide-subtitle animate-in delay-1" style="text-align: left;">
+                            SONAR no es un formulario. Es una conversación inteligente que se adapta a cada persona, profundiza donde hay valor y extrae información que los métodos tradicionales nunca capturan.
+                        </p>
+                        
+                        <div style="margin-top: 2rem;">
+                            <div class="animate-in delay-3" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFE600" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span style="opacity: 0.9;">Preguntas de seguimiento inteligentes</span>
+                            </div>
+                            <div class="animate-in delay-4" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFE600" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span style="opacity: 0.9;">Captura emociones y contexto</span>
+                            </div>
+                            <div class="animate-in delay-5" style="display: flex; align-items: center; gap: 1rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFE600" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span style="opacity: 0.9;">Disponible 24/7 en cualquier idioma</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-container animate-right delay-2" style="flex: 0 0 400px;">
+                        <div class="chat-header">
+                            <div class="chat-avatar">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                                </svg>
+                            </div>
+                            <div class="chat-header-text">
+                                <div class="chat-header-title">SONAR Assistant</div>
+                                <div class="chat-header-status">
+                                    <div class="status-dot"></div>
+                                    En línea
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-messages">
+                            <div class="chat-message bot">
+                                Hola! Cuéntame sobre tu trabajo diario. ¿Qué tareas ocupan la mayor parte de tu tiempo?
+                            </div>
+                            <div class="chat-message user">
+                                Paso mucho tiempo copiando datos de un sistema a otro y consolidando reportes de Excel.
+                            </div>
+                            <div class="chat-message bot">
+                                Interesante. ¿Aproximadamente cuántas horas a la semana dedicas a esas tareas de consolidación?
+                            </div>
+                            <div class="chat-message user">
+                                Diría que unas 15 horas semanales, a veces más.
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-counter">05 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 6: EL PODER DEL ANÁLISIS
+                 ========================================== -->
+            <section class="slide slide--dark" data-slide="5">
+                <div class="ey-logo"></div>
+                
+                <div class="slide-content">
+                    <h2 class="slide-title animate-in">De Conversaciones a <span class="highlight">Insights</span></h2>
+                    <p class="slide-subtitle animate-in delay-1">
+                        Toda la información consolidada, analizada y lista para actuar
+                    </p>
+                    
+                    <div class="analysis-grid animate-in delay-2">
+                        <div class="analysis-card">
+                            <div class="analysis-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div class="analysis-value"><span class="counter" data-target="247">0</span></div>
+                            <div class="analysis-label">Personas entrevistadas</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="analysis-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <div class="analysis-value"><span class="counter" data-target="89">0</span></div>
+                            <div class="analysis-label">Procesos identificados</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="analysis-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="12" y1="1" x2="12" y2="23"/>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                            <div class="analysis-value">$<span class="counter" data-target="2">0</span>.<span class="counter" data-target="4">0</span>M</div>
+                            <div class="analysis-label">Ahorro potencial anual</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container animate-in delay-3">
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Finanzas</span>
+                                <span>34 oportunidades</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress: 85%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Operaciones</span>
+                                <span>28 oportunidades</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress: 70%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Recursos Humanos</span>
+                                <span>19 oportunidades</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress: 48%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-counter">06 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 7: BENEFICIOS
+                 ========================================== -->
+            <section class="slide slide--accent" data-slide="6">
+                <div class="ey-logo"></div>
+                
+                <div class="slide-content">
+                    <h2 class="slide-title animate-in">¿Por qué SONAR?</h2>
+                    
+                    <div class="benefits-grid">
+                        <div class="benefit-card animate-left delay-1">
+                            <div class="benefit-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                </svg>
+                            </div>
+                            <div class="benefit-title">Velocidad</div>
+                            <div class="benefit-desc">Cientos de entrevistas en paralelo. Lo que tomaba semanas ahora toma días.</div>
+                        </div>
+                        
+                        <div class="benefit-card animate-right delay-2">
+                            <div class="benefit-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="m9 12 2 2 4-4"/>
+                                </svg>
+                            </div>
+                            <div class="benefit-title">Consistencia</div>
+                            <div class="benefit-desc">Mismas preguntas, misma profundidad. Datos verdaderamente comparables.</div>
+                        </div>
+                        
+                        <div class="benefit-card animate-left delay-3">
+                            <div class="benefit-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                </svg>
+                            </div>
+                            <div class="benefit-title">Profundidad</div>
+                            <div class="benefit-desc">La IA profundiza donde hay valor, capturando detalles que otros métodos pierden.</div>
+                        </div>
+                        
+                        <div class="benefit-card animate-right delay-4">
+                            <div class="benefit-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="12" y1="1" x2="12" y2="23"/>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                            <div class="benefit-title">Eficiencia</div>
+                            <div class="benefit-desc">Reducción de hasta 70% en costos de levantamiento de información.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-counter" style="color: var(--primary);">07 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 8: CASOS DE USO
+                 ========================================== -->
+            <section class="slide slide--light" data-slide="7">
+                <div class="ey-logo"></div>
+                
+                <div class="slide-content">
+                    <h2 class="slide-title animate-in">Casos de Uso</h2>
+                    <p class="slide-subtitle animate-in delay-1">
+                        SONAR se adapta a múltiples necesidades de levantamiento
+                    </p>
+                    
+                    <div class="use-cases-container">
+                        <div class="use-case animate-in delay-2">
+                            <div class="use-case-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                            </div>
+                            <div class="use-case-title">Transformación Digital</div>
+                            <div class="use-case-desc">Identifica procesos candidatos a automatización en toda la organización</div>
+                        </div>
+                        
+                        <div class="use-case animate-in delay-3">
+                            <div class="use-case-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                            </div>
+                            <div class="use-case-title">Due Diligence</div>
+                            <div class="use-case-desc">Evalúa procesos operativos en fusiones y adquisiciones de forma rápida</div>
+                        </div>
+                        
+                        <div class="use-case animate-in delay-4">
+                            <div class="use-case-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                    <line x1="11" y1="8" x2="11" y2="14"/>
+                                    <line x1="8" y1="11" x2="14" y2="11"/>
+                                </svg>
+                            </div>
+                            <div class="use-case-title">Diagnóstico Operativo</div>
+                            <div class="use-case-desc">Descubre ineficiencias ocultas y pain points del personal operativo</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-counter" style="color: var(--primary);">08 / 09</div>
+            </section>
+            
+            <!-- ==========================================
+                 SLIDE 9: CTA / CIERRE
+                 ========================================== -->
+            <section class="slide slide--dark" data-slide="8">
+                <div class="ey-logo"></div>
+                <div class="particles" id="particles9"></div>
+                
+                <div class="slide-content">
+                    <div class="cta-visual animate-scale">
+                        <div class="cta-sonar">
+                            <div class="cta-pulse"></div>
+                            <div class="cta-pulse"></div>
+                            <div class="cta-pulse"></div>
+                            <div class="cta-center">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="cta-title animate-in delay-2">
+                        Escuchemos a su <span class="highlight">organización</span>
+                    </h2>
+                    <p class="cta-subtitle animate-in delay-3">
+                        Cada conversación revela oportunidades. ¿Está listo para descubrirlas?
+                    </p>
+                    
+                    <button class="cta-button animate-in delay-4">
+                        Solicitar Demo
+                        <svg viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="animate-in delay-5" style="margin-top: 3rem; opacity: 0.5; font-size: 0.9rem;">
+                        <p>EY Consulting | Intelligent Automation</p>
+                    </div>
+                </div>
+                
+                <div class="slide-counter">09 / 09</div>
+            </section>
+            
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // NAVIGATION LOGIC
+        // ============================================
+        
+        const slidesTrack = document.getElementById('slidesTrack');
+        const slides = document.querySelectorAll('.slide');
+        const navDotsContainer = document.getElementById('navDots');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        
+        // Create navigation dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = `nav-dot ${i === 0 ? 'active' : ''}`;
+            dot.setAttribute('aria-label', `Ir a slide ${i + 1}`);
+            dot.onclick = () => goToSlide(i);
+            navDotsContainer.appendChild(dot);
+        });
+        
+        const navDots = document.querySelectorAll('.nav-dot');
+        
+        // Go to slide function
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+            
+            currentSlide = index;
+            
+            // Move track using transform
+            slidesTrack.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            
+            // Update dots
+            navDots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+            
+            // Update arrows
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            
+            // Update slide states for animations
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('in-view', i === currentSlide);
+            });
+            
+            // Trigger counter animations
+            if (currentSlide === 1 || currentSlide === 5) {
+                setTimeout(() => animateCounters(), 500);
+            }
+        }
+        
+        // Arrow click handlers
+        prevBtn.onclick = () => goToSlide(currentSlide - 1);
+        nextBtn.onclick = () => goToSlide(currentSlide + 1);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                goToSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                goToSlide(currentSlide - 1);
+            }
+        });
+        
+        // Touch/swipe support
+        let touchStartX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > 60) {
+                if (diff > 0) goToSlide(currentSlide + 1);
+                else goToSlide(currentSlide - 1);
+            }
+        }, { passive: true });
+        
+        // ============================================
+        // PARTICLE GENERATOR
+        // ============================================
+        
+        function createParticles(containerId, count = 30) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particle.style.width = (2 + Math.random() * 4) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.opacity = 0.1 + Math.random() * 0.3;
+                container.appendChild(particle);
+            }
+        }
+        
+        // Create particles for slides that need them
+        createParticles('particles1', 40);
+        createParticles('particles2', 25);
+        createParticles('particles5', 20);
+        createParticles('particles9', 35);
+        
+        // ============================================
+        // COUNTER ANIMATION
+        // ============================================
+        
+        function animateCounters() {
+            const counters = document.querySelectorAll('.slide.in-view .counter');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const duration = 2000;
+                const startTime = performance.now();
+                const startValue = 0;
+                
+                function updateCounter(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function (ease-out)
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const currentValue = Math.round(startValue + (target - startValue) * easeOut);
+                    
+                    counter.textContent = currentValue;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCounter);
+                    }
+                }
+                
+                requestAnimationFrame(updateCounter);
+            });
+        }
+        
+        // Initial counter animation for first slide (if needed)
+        setTimeout(() => animateCounters(), 1000);
+    </script>
+</body>
+</html>
