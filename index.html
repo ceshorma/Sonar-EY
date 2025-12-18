@@ -1126,17 +1126,41 @@
             .nav-arrow { display: none; }
             .keyboard-hint { display: none; }
             .ey-logo { width: 45px; height: 39px; top: 20px; left: 20px; }
-            
+
             .benefits-grid,
             .analysis-grid { grid-template-columns: 1fr; }
-            
+
             .flow-container { flex-direction: column; }
             .flow-arrow { transform: rotate(90deg); }
-            
+
             .use-cases-container { flex-direction: column; align-items: center; }
-            
+
             .problem-stats { gap: 1.5rem; }
             .stat-number { font-size: 2rem; }
+
+            /* Conversaciones Naturales slide - Mobile */
+            .slide[data-slide="4"] .slide-content {
+                flex-direction: column !important;
+                gap: 2rem !important;
+                padding: 1rem !important;
+            }
+
+            .slide[data-slide="4"] .slide-content > div:first-child {
+                text-align: center !important;
+            }
+
+            .slide[data-slide="4"] .slide-title {
+                font-size: 1.8rem !important;
+            }
+
+            .slide[data-slide="4"] .slide-subtitle {
+                text-align: center !important;
+            }
+
+            .slide[data-slide="4"] .chat-container {
+                flex: 1 1 auto !important;
+                max-width: 100% !important;
+            }
         }
     </style>
 </head>
