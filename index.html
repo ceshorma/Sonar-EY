@@ -1142,16 +1142,68 @@
             .keyboard-hint { display: none; }
             .ey-logo { width: 45px; height: 39px; top: 20px; left: 20px; }
 
+            /* Allow vertical scrolling on mobile */
+            .slide {
+                overflow-y: auto;
+                overflow-x: hidden;
+                align-items: flex-start;
+                padding-top: 80px;
+                padding-bottom: 80px;
+            }
+
+            .slide-content {
+                padding: 1rem;
+                width: 100%;
+            }
+
+            .slide-counter {
+                bottom: 15px;
+                right: 20px;
+                font-size: 0.75rem;
+            }
+
+            .nav-dots {
+                bottom: 15px;
+                padding: 8px 15px;
+            }
+
             .benefits-grid,
-            .analysis-grid { grid-template-columns: 1fr; }
+            .analysis-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
 
-            .flow-container { flex-direction: column; }
-            .flow-arrow { transform: rotate(90deg); }
+            .flow-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 0.5rem 0;
+            }
 
-            .use-cases-container { flex-direction: column; align-items: center; }
+            .use-cases-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
 
-            .problem-stats { gap: 1.5rem; }
+            .problem-stats {
+                gap: 1.5rem;
+                flex-direction: column;
+            }
             .stat-number { font-size: 2rem; }
+
+            /* Reduce radar size on mobile */
+            .radar-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            /* Analysis progress bars */
+            .progress-container {
+                margin-top: 1.5rem;
+            }
 
             /* Conversaciones Naturales slide - Mobile */
             .slide[data-slide="4"] .slide-content {
